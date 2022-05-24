@@ -1,10 +1,12 @@
 import graphene
+import uuid
 
 from serializers import (
     CategoryGrapheneInputModel,
     CategoryGrapheneModel,
     ProductGrapheneInputModel,
     ProductGrapheneModel,
+    ProductsModel,
 )
 
 from models.product import Product
@@ -13,9 +15,13 @@ from models.category import Category
 
 class Query(graphene.ObjectType):
     say_hello = graphene.String(name=graphene.String(default_value='Test Driven'))
-    list_categories = graphene.List(CategoryGrapheneModel)
+
     list_products = graphene.List(ProductGrapheneModel)
+    total_products = graphene.Field(graphene.Int)
+    total_price = graphene.Field(graphene.Int)
     get_single_product = graphene.Field(ProductGrapheneModel, product_id=graphene.NonNull(graphene.Int))
+
+    list_categories = graphene.List(CategoryGrapheneModel)
     get_single_category = graphene.Field(CategoryGrapheneModel, category_id=graphene.NonNull(graphene.Int))
 
     @staticmethod
@@ -29,6 +35,18 @@ class Query(graphene.ObjectType):
     @staticmethod
     def resolve_list_products(parent, info):
         return Product.all()
+
+    @staticmethod
+    def resolve_total_products(parent, info):
+        return Product.all().count()
+
+    @staticmethod
+    def resolve_total_price(parent, info):
+        tp = 0
+        for i in Product.all():
+            tp += i.price
+
+        return tp
 
     @staticmethod
     def resolve_get_single_product(parent, info, product_id):
@@ -63,7 +81,7 @@ class CreateProduct(graphene.Mutation):
 
     @staticmethod
     def mutate(parent, info, product_details):
-        cat = Category.find_or_fail(product_details.cat_id)
+        cat = Category.find_or_fail(product_details.category_id)
         product = Product()
         product.name = product_details.name
         product.price = product_details.price

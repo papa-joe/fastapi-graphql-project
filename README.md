@@ -5,7 +5,7 @@ Api that stores products by categoty, the project makes use of postgrsql db
 
 ## SETUP
 Make sure you have python3 setup on your machine.
-Clone the repo, start a new virtual enviroment in the root folder(recommended), then run 
+Clone the repo, start a new virtual enviroment in the root folder(recommended), change the db_name and user_name in db.py to the database name and username on your postgresql then run 
 
 ```
 pip install -r packages.txt
@@ -90,6 +90,8 @@ query GetAllProducts {
     price
     categoryId
   }
+  totalProducts
+  totalPrice
 }
 ```
 
